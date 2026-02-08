@@ -1,0 +1,38 @@
+## .NET ##
+**/[Bb]in/
+**/[Oo]bj/
+**/.vs/
+**/*.user
+**/*.cache
+
+## NuGet ##
+**/.nuget/
+**/packages/
+**/*.nupkg
+
+## IDE ##
+**/.vscode/
+**/.idea/
+**/*.suo
+**/*.swp
+
+## Project files ##
+**/*.csproj.user
+
+## Config files ##
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+secrets.json
+
+## React ##
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+.env
+.env.local
+
+## Logs ##
+*.log
