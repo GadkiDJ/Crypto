@@ -3,14 +3,14 @@ using Crypto.Application.Auth;
 namespace Crypto.Controllers
 {
     [ApiController]
-    [Route("auth")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly AuthService _auth;
 
         public AuthController(AuthService auth)
         {
-            auth = _auth;
+            _auth = auth;
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest request)

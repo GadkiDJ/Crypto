@@ -39,6 +39,18 @@ builder.Services
             };
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+
+
 
 // ---------------- DB ----------------
 
@@ -65,7 +77,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
+app.UseCors("Frontend");
 
 // ---------------- PIPELINE ----------------
 
