@@ -1,9 +1,17 @@
+using Binance.Net.Clients;
+using Binance.Net.Objects.Options;
 using Crypto.Application.Auth;
 using Crypto.Application.Common;
+using Crypto.Application.Interfaces;
+using Crypto.Application.MarketData;
+using Crypto.Controllers.Hubs;
 using Crypto.Infrastructure.Auth;
 using Crypto.Infrastructure.Data;
+using Crypto.Infrastructure.MarketData;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -17,7 +25,7 @@ builder.Services.Configure<JwtOptions>(
 
 var jwt = builder.Configuration
     .GetSection("Jwt")
-    .Get<JwtOptions>();
+    .Get<JwtOptions>() ?? throw new InvalidOperationException("Jwt configuration is missing");
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -70,6 +78,17 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CurrentUserService>();
 
 
+builder.Services.AddSingleton<BinanceRestClient>();
+builder.Services.AddScoped<IMarketDataService, BinanceMarketDataService>();
+
+builder.Services.Configure<BinanceSocketOptions>(options => { });
+builder.Services.AddSingleton(provider => 
+    new BinanceSocketClient(provider.GetRequiredService<IOptions<BinanceSocketOptions>>(),
+                            provider.GetRequiredService<ILoggerFactory>()));
+builder.Services.AddSingleton<IMarketDataStreamService, BinanceStreamService>();
+
+builder.Services.AddSingleton<StreamBroadcastService>();
+builder.Services.AddSignalR();
 // ---------------- API ----------------
 
 builder.Services.AddControllers();
@@ -77,6 +96,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+app.MapHub<MarketDataHub>("/hubs/market");
 app.UseCors("Frontend");
 
 // ---------------- PIPELINE ----------------

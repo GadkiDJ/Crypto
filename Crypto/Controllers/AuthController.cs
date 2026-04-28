@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Crypto.Application.Auth;
+﻿using Crypto.Application.Auth;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 namespace Crypto.Controllers
 {
     [ApiController]
     [Route("api/auth")]
+    [AllowAnonymous]
     public class AuthController : ControllerBase
     {
         private readonly AuthService _auth;
@@ -15,8 +17,8 @@ namespace Crypto.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            await _auth.Register(request);
-            return Ok();
+            var token = await _auth.Register(request);
+            return Ok(new {token = token});
         }
 
         [HttpPost("login")]
@@ -25,9 +27,9 @@ namespace Crypto.Controllers
             var token = await _auth.Login(request);
 
             if (token == null)
-                return Unauthorized();
+                return Unauthorized(new {message = "Invalid email or password"});
 
-            return Ok(token);
+            return Ok(new {token = token});
         }
     }
 }

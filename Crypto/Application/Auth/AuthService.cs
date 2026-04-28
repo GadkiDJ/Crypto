@@ -20,7 +20,7 @@ public class AuthService
         _jwt = jwt;
     }
 
-    public async Task Register(RegisterRequest request)
+    public async Task<string> Register(RegisterRequest request)
     {
         var tenant = new Tenant
         {
@@ -44,6 +44,7 @@ public class AuthService
         _db.Users.Add(user);
 
         await _db.SaveChangesAsync();
+        return _jwt.Generate(user);
     }
 
     public async Task<string?> Login(LoginRequest request)
